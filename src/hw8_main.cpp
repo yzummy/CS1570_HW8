@@ -4,3 +4,8 @@
    File: hw8_main.cpp
    Purpose:
 */
+
+int main()
+{
+  return 0;
+}
