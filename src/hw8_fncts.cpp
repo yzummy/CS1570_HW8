@@ -53,3 +53,59 @@ void appendRandomPrefix( char buffer[] )
   in.close( );
   return;
 }
+
+float getScore(const int numCharQue, const char answer[])
+{
+  float totScore = 0;;
+  int wordScore = 0;
+  int count = 0;
+  int multiplier; 
+  int random;
+  char c;
+  c = answer[count];
+  while (c != 0)
+  {
+    if (c == ' ')
+    {
+      random = rand() % 100 + 1;
+      if (random <= TRIPLE_WORD_CHANCE_UPPER)
+        multiplier = TRIPLE;
+      else if (random <= DOUBLE_WORD_CHANCE_UPPER)
+        multiplier = DOUBLE;
+      wordScore *= multiplier;
+      totScore += wordScore;
+      wordScore = 0;
+    }
+    else
+    {
+      multiplier = 1;
+      random = rand() % 100 + 1;
+      if (random <= TRIPLE_LETTER_CHANCE_UPPER)
+        multiplier = TRIPLE;
+      else if (random <= DOUBLE_LETTER_CHANCE_UPPER)
+        multiplier = DOUBLE;
+      c = tolower(c);
+      if (c == 'e' || c == 'a' || c == 'i' || c == 'o' || c == 'n'
+        || c == 'r' || c == 't' || c == 'l' || c == 's' || c == 'u')
+        wordScore += multiplier * 1;
+      else if (c == 'd' || c == 'g')
+        wordScore += multiplier * 2;
+      else if (c == 'b' || c == 'c' || c == 'm' || c == 'p')
+        wordScore += multiplier * 3;
+      else if (c == 'f' || c == 'h' || c == 'v' || c == 'w' || c == 'y')
+        wordScore += multiplier * 4;
+      else if (c == 'k')
+        wordScore += multiplier * 5;
+      else if (c == 'j' || c == 'x')
+        wordScore += multiplier * 8;
+      else if (c == 'q' || c == 'z')
+        wordScore += multiplier * 10;
+    }
+
+    c = answer[++count];
+  }
+
+  totScore /= numCharQue;
+
+  return totScore;
+}

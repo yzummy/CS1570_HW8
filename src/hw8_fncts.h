@@ -32,12 +32,25 @@ const short MAX_WORD_LEN = 20;
 // max answer/sentence length in characters
 const short MAX_SENTENCE_LEN = 1000;
 
+// the upper bound of percentage that would triple letter score
+const short TRIPLE_LETTER_CHANCE_UPPER = 2;
+// the upper bound of percentage that would double letter score
+const short DOUBLE_LETTER_CHANCE_UPPER = TRIPLE_LETTER_CHANCE_UPPER + 3;
+// the upper bound of percentage that would triple word score
+const short TRIPLE_WORD_CHANCE_UPPER = 2;
+// the upper bound of percentage that would double word score
+const short DOUBLE_WORD_CHANCE_UPPER = TRIPLE_WORD_CHANCE_UPPER + 5;
+
+// multipliers for score
+const short TRIPLE = 3;
+const short DOUBLE = 2;
+
 // Desc:
 // Pre:
 // Post:
 
 template <typename T>
-void openFile( T& fileIn, const char fileName[] )
+void openFile(T & fileIn, const char fileName[])
 {
   fileIn.open( fileName );
 
@@ -56,7 +69,7 @@ void openFile( T& fileIn, const char fileName[] )
 // Post:
 
 template <typename T>
-void reuseStream( T& fileIn, const char fileName[] )
+void reuseStream( T & fileIn, const char fileName[] )
 {
   // get stream object ready for reuse
   fileIn.clear( ); // clear connection
@@ -79,5 +92,12 @@ long getNumLinesInFile( const char fileName[] );
 // Post:
 
 void appendRandomPrefix( char buffer[] );
+
+// Desc:
+// Pre:
+// Post:
+
+float getScore(const int numCharQue, const char answer[]);
+
 
 #endif
