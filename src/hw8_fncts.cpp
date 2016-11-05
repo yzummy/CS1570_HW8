@@ -6,7 +6,11 @@
 */
 
 #include "hw8_fncts.h"
-
+#include <string>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
 using namespace std;
 
 long getNumLinesInFile( const char fileName[] )
@@ -130,3 +134,95 @@ float getScore(const int numCharQue, const char answer[])
 
   return totScore;
 }
+
+void getAnswer(char answer[], const char sentenceFile[], const char interjectionFile[])
+{
+  short randNum = myRand(MIN_SENTENCES, MAX_SENTENCES);
+  int numSentences;
+  int lineNum;
+  char line[MAX_SENTENCE_LEN] = { 0 };
+  
+  ifstream inSentence, inInterject;
+  openFile(inInterject, interjectionFile);
+  openFile(inSentence, sentenceFile);
+  inSentence >> numSentences; 
+  for (int i = 0; i < randNum; i++)
+  {
+    char part[MAX_SENTENCE_LEN / 2] = { 0 };
+    reuseStream(inSentence, sentenceFile);
+    lineNum = myRand(1, numSentences) + 1;
+    getLine(inSentence, lineNum, line);
+    getPart(line, part, randNum, i);
+    strcat(answer, part);
+    if(i < randNum - 1)
+      addInterject(answer, inInterject);
+  }
+  inSentence.close();
+  inInterject.close();
+  return;
+}
+
+void getLine(ifstream & in, const int lineNum, char line[])
+{
+  for (int i = 1; i < lineNum; i++)
+    in.ignore(MAX_SENTENCE_LEN,'\n');
+  in.getline(line, MAX_SENTENCE_LEN-1);
+  return;
+}
+
+
+
+void getPart(const char line[], char part[], const int totParts, const int partNum)
+{
+  int length = strlen(line);
+  int left = length / totParts * partNum;
+  int right = length;
+  int count=0;
+ 
+  if (partNum != totParts-1)
+  {
+    right = length / totParts * (partNum + 1);
+    while (line[right] != ' ')
+      right--;
+  }
+
+  if (partNum != 0)
+  {
+    while (line[left] != ' ')
+      left--;
+  }
+  
+  while (left < right)
+  {
+    part[count] = line[left++];
+    count++;
+  }
+  part[count] = '\0';
+
+  return;
+}
+
+void addInterject(char answer[], ifstream & inInterject)
+{
+    int randNum = myRand(1, 100);
+    int numLines;
+    int lineNum;
+    char interjection[MAX_SENTENCE_LEN];
+    if (randNum <= CHANCE_INTERJECTION)
+    {
+      inInterject >> numLines;
+      lineNum = myRand(1, numLines) + 1;
+      for (int i = 0; i < lineNum; i++)
+        inInterject.ignore(MAX_SENTENCE_LEN, '\n');
+      inInterject.ignore(3);
+      inInterject.getline(interjection, MAX_SENTENCE_LEN - 1,'.');
+      strcat(answer, " ");
+      strcat(answer, interjection);        
+    }
+    return;
+  
+}
+
+
+
+

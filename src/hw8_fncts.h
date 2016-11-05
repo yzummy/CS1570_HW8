@@ -40,10 +40,18 @@ const short DOUBLE_LETTER_CHANCE = 3;
 const short TRIPLE_WORD_CHANCE = 2;
 // percent chance double word score
 const short DOUBLE_WORD_CHANCE = 5;
+// percent chance apending Prefix
+const short CHANCE_APPENDING = 50;
+// percent chance adding interjection
+const short CHANCE_INTERJECTION = 25;
 
 // multipliers for score
 const short TRIPLE = 3;
 const short DOUBLE = 2;
+
+//minimum and maximum number of sentences chosen from file
+const short MIN_SENTENCES = 2;
+const short MAX_SENTENCES = 4;
 
 // Desc:
 // Pre:
@@ -74,6 +82,31 @@ long getScoreMult( int doubleChance, int tripleChance );
 // Post:
 
 float getScore(const int numCharQue, const char answer[]);
+
+// Desc:
+// Pre:
+// Post:
+
+void getAnswer(char answer[], const char sentenceFile[], const char interjectionFile[]);
+
+// Desc:
+// Pre:
+// Post:
+
+void getLine(ifstream & in, const int lineNum, char line[]);
+
+// Desc:
+// Pre:
+// Post:
+
+void getPart(const char line[], char part[], const int totParts, const int partNum);
+
+// Desc:
+// Pre:
+// Post:
+
+void addInterject(char answer[], ifstream & inInterject);
+
 
 // Desc:
 // Pre:
