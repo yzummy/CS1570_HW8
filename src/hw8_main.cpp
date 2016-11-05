@@ -5,12 +5,18 @@
    Purpose:
 */
 
-#include <iostream>
 #include "hw8_fncts.h"
 
 using namespace std;
 
-int main()
+int main( )
 {
+  char buffer[MAX_SENTENCE_LEN] = " Did it work?";
+
+  srand( time( NULL ) ); // set seed for pseudo-random number generation
+
+  appendRandomPrefix( buffer );
+  cout << buffer << endl;
+
   return 0;
 }
