@@ -54,55 +54,74 @@ void appendRandomPrefix( char buffer[] )
   return;
 }
 
+long myRand( const long min, const long max )
+{
+  return rand() % ( max - min + 1 ) + min;
+}
+
+long getScoreMult( int doubleChance, int tripleChance )
+{
+  int scoreMult = 1;
+
+  if ( myRand( 1, 100 ) <= doubleChance )
+    scoreMult = DOUBLE;
+  else if ( myRand( 1, 100 ) <= tripleChance )
+    scoreMult = TRIPLE;
+
+  return scoreMult;
+}
+
 float getScore(const int numCharQue, const char answer[])
 {
-  float totScore = 0;;
+  float totScore = 0;
   int wordScore = 0;
-  int count = 0;
-  int multiplier; 
-  int random;
-  char c;
-  c = answer[count];
-  while (c != 0)
+  int multiplier = 1;
+  int letterScore = 1;
+
+  for ( int i = 0; answer[i] != '\0'; ++i )
   {
-    if (c == ' ')
+    if ( isspace( answer[i] ) )
     {
-      random = rand() % 100 + 1;
-      if (random <= TRIPLE_WORD_CHANCE_UPPER)
-        multiplier = TRIPLE;
-      else if (random <= DOUBLE_WORD_CHANCE_UPPER)
-        multiplier = DOUBLE;
-      wordScore *= multiplier;
-      totScore += wordScore;
+      multiplier = getScoreMult( DOUBLE_WORD_CHANCE, TRIPLE_WORD_CHANCE );
+      totScore += wordScore * multiplier;
       wordScore = 0;
     }
-    else
+    else if ( isalpha( answer[i] ) )
     {
-      multiplier = 1;
-      random = rand() % 100 + 1;
-      if (random <= TRIPLE_LETTER_CHANCE_UPPER)
-        multiplier = TRIPLE;
-      else if (random <= DOUBLE_LETTER_CHANCE_UPPER)
-        multiplier = DOUBLE;
-      c = tolower(c);
-      if (c == 'e' || c == 'a' || c == 'i' || c == 'o' || c == 'n'
-        || c == 'r' || c == 't' || c == 'l' || c == 's' || c == 'u')
-        wordScore += multiplier * 1;
-      else if (c == 'd' || c == 'g')
-        wordScore += multiplier * 2;
-      else if (c == 'b' || c == 'c' || c == 'm' || c == 'p')
-        wordScore += multiplier * 3;
-      else if (c == 'f' || c == 'h' || c == 'v' || c == 'w' || c == 'y')
-        wordScore += multiplier * 4;
-      else if (c == 'k')
-        wordScore += multiplier * 5;
-      else if (c == 'j' || c == 'x')
-        wordScore += multiplier * 8;
-      else if (c == 'q' || c == 'z')
-        wordScore += multiplier * 10;
-    }
+      multiplier = getScoreMult( DOUBLE_LETTER_CHANCE, TRIPLE_LETTER_CHANCE );
 
-    c = answer[++count];
+      switch( tolower( answer[i] ) )
+      {
+        case 'd': case 'g':
+          letterScore = 2;
+        break;
+
+        case 'b': case 'c': case 'm': case 'p':
+         letterScore = 3;
+        break;
+
+        case 'f': case 'h': case 'v': case 'w': case 'y':
+          letterScore = 4;
+        break;
+
+        case 'k':
+          letterScore = 5;
+        break;
+
+        case 'j': case 'x':
+          letterScore = 8;
+        break;
+
+        case 'q': case 'z':
+          letterScore = 10;
+        break;
+
+        default:
+          letterScore = 1;
+      }
+
+      wordScore += multiplier * letterScore;
+    }
   }
 
   totScore /= numCharQue;

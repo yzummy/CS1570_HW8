@@ -19,8 +19,5 @@ int main( )
   cout << buffer << endl;
 
   cout << "score: " << getScore(5, buffer);
-
-  int a;
-  cin >> a;
   return 0;
 }

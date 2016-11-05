@@ -32,18 +32,48 @@ const short MAX_WORD_LEN = 20;
 // max answer/sentence length in characters
 const short MAX_SENTENCE_LEN = 1000;
 
-// the upper bound of percentage that would triple letter score
-const short TRIPLE_LETTER_CHANCE_UPPER = 2;
-// the upper bound of percentage that would double letter score
-const short DOUBLE_LETTER_CHANCE_UPPER = TRIPLE_LETTER_CHANCE_UPPER + 3;
-// the upper bound of percentage that would triple word score
-const short TRIPLE_WORD_CHANCE_UPPER = 2;
-// the upper bound of percentage that would double word score
-const short DOUBLE_WORD_CHANCE_UPPER = TRIPLE_WORD_CHANCE_UPPER + 5;
+// percent chance triple letter score
+const short TRIPLE_LETTER_CHANCE = 2;
+// percent chance double letter score
+const short DOUBLE_LETTER_CHANCE = 3;
+// percent chance triple word score
+const short TRIPLE_WORD_CHANCE = 2;
+// percent chance double word score
+const short DOUBLE_WORD_CHANCE = 5;
 
 // multipliers for score
 const short TRIPLE = 3;
 const short DOUBLE = 2;
+
+// Desc:
+// Pre:
+// Post:
+
+long getNumLinesInFile( const char fileName[] );
+
+// Desc:
+// Pre:
+// Post:
+
+void appendRandomPrefix( char buffer[] );
+
+// Desc:
+// Pre:
+// Post:
+
+long myRand( const long min, const long max );
+
+// Desc:
+// Pre:
+// Post:
+
+long getScoreMult( int doubleChance, int tripleChance );
+
+// Desc:
+// Pre:
+// Post:
+
+float getScore(const int numCharQue, const char answer[]);
 
 // Desc:
 // Pre:
@@ -80,24 +110,5 @@ void reuseStream( T & fileIn, const char fileName[] )
 
   return;
 }
-
-// Desc:
-// Pre:
-// Post:
-
-long getNumLinesInFile( const char fileName[] );
-
-// Desc:
-// Pre:
-// Post:
-
-void appendRandomPrefix( char buffer[] );
-
-// Desc:
-// Pre:
-// Post:
-
-float getScore(const int numCharQue, const char answer[]);
-
 
 #endif
