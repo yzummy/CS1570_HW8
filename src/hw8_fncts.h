@@ -65,45 +65,51 @@ long getNumLinesInFile( const char fileName[] );
 
 void appendRandomPrefix( char buffer[] );
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the myRand() function will generate a random long within the range
+// Pre: none
+// Post: A random long within the range would be generated
 
 long myRand( const long min, const long max );
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the getScoreMult() function will get a random multiplier  
+// Pre: both doubleChance and tripleChance have to be bigger between 0 and 100
+// Post: A random score multiplier will be returned
 
 long getScoreMult( int doubleChance, int tripleChance );
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the getScore() function will return a score according to the answer
+// Pre: numCharQue has to be positive
+// Post: a score corresponding to the will be returned
 
 float getScore(const int numCharQue, const char answer[]);
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the getAnswer() function will generate the answer for candidates
+// Pre: the files with file name sentenceFile and interjectionFile have to
+//      exist
+// Post: the answer generated for that candidate will be stored in answer[]
 
-void getAnswer(char answer[], const char sentenceFile[], const char interjectionFile[]);
+void getAnswer(char answer[], const char sentenceFile[], 
+                const char interjectionFile[]);
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the getLine() function will store the specific line in the file 
+//       into line[]
+// Pre:  in has to be open already and lineNum has to be positive
+// Post: the lineNum-th line in the file would be stored in line[]
 
 void getLine(ifstream & in, const int lineNum, char line[]);
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the getPart() function will separate the line into approximately
+//       equal parts and store the partNum-th part into part[]
+// Pre:  totParts and partNum have to be positive
+// Post: the partNum-th part of the line would be stored in part[]
 
-void getPart(const char line[], char part[], const int totParts, const int partNum);
+void getPart(const char line[], char part[], const int totParts,
+             const int partNum);
 
-// Desc:
-// Pre:
-// Post:
+// Desc: the addinterject() function will append an interjection phrase
+//       to the answer
+// Pre:  inInterject file input stream has to be open
+// Post: an interjection phrase would be append to the answer
 
 void addInterject(char answer[], ifstream & inInterject);
 
@@ -143,5 +149,9 @@ void reuseStream( T & fileIn, const char fileName[] )
 
   return;
 }
+
+
+void changePunct(char answer[]);
+
 
 #endif

@@ -18,6 +18,8 @@ int main( )
   getAnswer(answer, CAND_ONE_SENTENCES, CAND_ONE_INTERJECTIONS); \
 
     cout << "answer: " << answer << endl;
+  changePunct(answer);
+  cout << endl;
   //Append hte prefix the the answer
   if(myRand(1,100)<=CHANCE_APPENDING)
     appendRandomPrefix( buffer );

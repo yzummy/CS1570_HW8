@@ -60,6 +60,7 @@ void appendRandomPrefix( char buffer[] )
 
 long myRand( const long min, const long max )
 {
+  // get a random number between min and max inclusively
   return rand() % ( max - min + 1 ) + min;
 }
 
@@ -67,6 +68,7 @@ long getScoreMult( int doubleChance, int tripleChance )
 {
   int scoreMult = 1;
 
+  // set scoreMult to double or triple by chance
   if ( myRand( 1, 100 ) <= doubleChance )
     scoreMult = DOUBLE;
   else if ( myRand( 1, 100 ) <= tripleChance )
@@ -81,18 +83,19 @@ float getScore(const int numCharQue, const char answer[])
   int wordScore = 0;
   int multiplier = 1;
   int letterScore = 1;
-
   int i = 0;
 
   do
   {
-    if ( answer[i] == ' ' || answer[i] == '\0' )
+    // add wordScore to totScore when it's space
+    if ( answer[i] == ' ' || answer[i] == '\0' ) 
     {
       multiplier = getScoreMult( DOUBLE_WORD_CHANCE, TRIPLE_WORD_CHANCE );
       totScore += wordScore * multiplier;
       wordScore = 0;
     }
-    else if ( isalpha( answer[i] ) )
+    // if it is a letter, add letter score to wordScore
+    else if ( isalpha( answer[i] ) ) 
     {
       multiplier = getScoreMult( DOUBLE_LETTER_CHANCE, TRIPLE_LETTER_CHANCE );
 
@@ -135,17 +138,24 @@ float getScore(const int numCharQue, const char answer[])
   return totScore;
 }
 
-void getAnswer(char answer[], const char sentenceFile[], const char interjectionFile[])
+void getAnswer(char answer[], const char sentenceFile[], 
+               const char interjectionFile[])
 {
+  // get number of sentences to take from the file
   short randNum = myRand(MIN_SENTENCES, MAX_SENTENCES);
   int numSentences;
   int lineNum;
   char line[MAX_SENTENCE_LEN] = { 0 };
   
+  // open the sentence and interjection files
   ifstream inSentence, inInterject;
   openFile(inInterject, interjectionFile);
   openFile(inSentence, sentenceFile);
-  inSentence >> numSentences; 
+
+  // get number of lines in the sentence file
+  inSentence >> numSentences;
+
+  // add part of the line to the answer and add interjection by chance
   for (int i = 0; i < randNum; i++)
   {
     char part[MAX_SENTENCE_LEN / 2] = { 0 };
@@ -157,6 +167,8 @@ void getAnswer(char answer[], const char sentenceFile[], const char interjection
     if(i < randNum - 1)
       addInterject(answer, inInterject);
   }
+
+  // close file streams
   inSentence.close();
   inInterject.close();
   return;
@@ -164,6 +176,7 @@ void getAnswer(char answer[], const char sentenceFile[], const char interjection
 
 void getLine(ifstream & in, const int lineNum, char line[])
 {
+  // ignore all lines until lineNum-th line in the file
   for (int i = 1; i < lineNum; i++)
     in.ignore(MAX_SENTENCE_LEN,'\n');
   in.getline(line, MAX_SENTENCE_LEN-1);
@@ -179,6 +192,7 @@ void getPart(const char line[], char part[], const int totParts, const int partN
   int right = length;
   int count=0;
  
+  // get left index of the white space
   if (partNum != totParts-1)
   {
     right = length / totParts * (partNum + 1);
@@ -186,17 +200,21 @@ void getPart(const char line[], char part[], const int totParts, const int partN
       right--;
   }
 
+  // get right index of the white space 
   if (partNum != 0)
   {
     while (line[left] != ' ')
       left--;
   }
   
+  // store that part of the line into the part[]
   while (left < right)
   {
     part[count] = line[left++];
     count++;
   }
+
+  // add null character to the part[]
   part[count] = '\0';
 
   return;
@@ -208,21 +226,34 @@ void addInterject(char answer[], ifstream & inInterject)
     int numLines;
     int lineNum;
     char interjection[MAX_SENTENCE_LEN];
+
+    // add interjection by chance
     if (randNum <= CHANCE_INTERJECTION)
     {
       inInterject >> numLines;
       lineNum = myRand(1, numLines) + 1;
       for (int i = 0; i < lineNum; i++)
         inInterject.ignore(MAX_SENTENCE_LEN, '\n');
+      
+      // ignore the three dots at the beginning
       inInterject.ignore(3);
+
+      // read until reaches the dot at the end
       inInterject.getline(interjection, MAX_SENTENCE_LEN - 1,'.');
+      
+      // add white space to the end of the interjection
       strcat(answer, " ");
+
+      // concatenate the interjection to the answer
       strcat(answer, interjection);        
     }
     return;
   
 }
 
-
-
-
+void changePunct(char answer[])
+{
+  int endIndex = strlen(answer) - 1;
+  cout << answer[endIndex];
+  return;
+}
