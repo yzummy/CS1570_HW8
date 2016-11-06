@@ -78,9 +78,11 @@ float getScore(const int numCharQue, const char answer[])
   int multiplier = 1;
   int letterScore = 1;
 
-  for ( int i = 0; answer[i] != '\0'; ++i )
+  int i = 0;
+
+  do
   {
-    if ( isspace( answer[i] ) )
+    if ( answer[i] == ' ' || answer[i] == '\0' )
     {
       multiplier = getScoreMult( DOUBLE_WORD_CHANCE, TRIPLE_WORD_CHANCE );
       totScore += wordScore * multiplier;
@@ -122,7 +124,7 @@ float getScore(const int numCharQue, const char answer[])
 
       wordScore += multiplier * letterScore;
     }
-  }
+  } while ( answer[i++] != '\0' );
 
   totScore /= numCharQue;
 
