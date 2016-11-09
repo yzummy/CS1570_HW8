@@ -1,8 +1,9 @@
 /*
    Programmers: Christopher O'Toole and Yunchao Zhang
-   Date:
-   File: hw8_fncts.hpp
-   Purpose:
+   Date: 11/8/2016
+   File: hw8_fncts.h
+   Purpose: Contains function declarations for generating the content of the debate
+            and scoring the candidates' responses.
 */
 
 #ifndef HW8_FNCTS_H
@@ -63,78 +64,92 @@ const short DOUBLE = 2;
 const short MIN_SENTENCES = 2;
 const short MAX_SENTENCES = 4;
 
+// Desc: The getline( ) function retrieves a line at the lineNum pos in a file
+// Pre:  lineNum > 0 and <= the total number of lines in the file
+//       The in param is an open file stream
+// Post: The line[] array is updated in the calling function with the line at
+//     the lineNum pos from the file associated with in.
 
-// Desc: the getLine() function will store the specific line in the file
-//       into line[]
-// Pre:  in has to be open already and lineNum has to be positive
-// Post: the lineNum-th line in the file would be stored in line[]
+void getline( ifstream& in, const int lineNum, char line[] );
 
-void getline( ifstream & in, const int lineNum, char line[] );
-
-// Desc:
-// Pre:
-// Post:
+// Desc: The getNumLinesInFile( ) function computes the total number of lines
+//    in the file named by the fileName param.
+// Pre: The file referred to by fileName exists.
+// Post: The total number of lines in the given file is returned.
 
 int getNumLinesInFile( const char fileName[] );
 
-// Desc:
-// Pre:
-// Post:
+// Desc: The appendRandomPrefix( ) function appends a random prefix
+//    contained in the file described by the prefixFile param.
+// Pre: The file referred to by prefixFile exists.
+// Post: The buffer param is prepended in the calling function with a random
+//    prefix retrieved from the file.
 
-void appendRandomPrefix( char buffer[] );
+void appendRandomPrefix( char buffer[], const char prefixFile[] );
 
-// Desc: the myRand() function will generate a random int within the range
-// Pre: none
-// Post: A random int within the range would be generated
+// Desc: The myRand( ) function generates a pseudo-random number within the
+//    interval [min, max].
+// Pre: max > min, max > 0 and min >= 0
+// Post: A pseudo-random number within the interval [min, max] is returned.
 
 int myRand( const int min, const int max );
 
-// Desc: the getScoreMult() function will get a random multiplier
-// Pre: both doubleChance and tripleChance have to be bigger between 0 and 100
-// Post: A random score multiplier will be returned
+// Desc: The getScoreMult( ) function will return a score multiplier at random
+//    given the chance for the double and triple multiplier.
+// Pre: 0 < doubleChance, tripleChance < 100
+// Post: A random score multiplier will be returned.
 
 int getScoreMult( int doubleChance, int tripleChance );
 
-// Desc: the getScore() function will return a score according to the answer
-// Pre: numCharQue has to be positive
-// Post: a score corresponding to the will be returned
+// Desc: The getScore( ) function will return a score of the candidate's
+//    answer based upon its content and the question length.
+// Pre: questionLen > 0
+// Post: The score for the candidate's response is returned.
 
-float getScore(const int numCharQue, const char answer[]);
+float getScore( const int questionLen, const char answer[] );
 
-// Desc: the getAnswer() function will generate the answer for candidates
-// Pre: the files with file name sentenceFile and interjectionFile have to
-//      exist
-// Post: the answer generated for that candidate will be stored in answer[]
+// Desc: The getAnswer( ) function generates a response for both candidates.
+// Pre: The files named by the sentenceFile and interjectionFile params must
+//    exist.
+// Post: The answer param will be updated with the candidate's response in the
+//    calling function.
 
-void getAnswer(char answer[], const char sentenceFile[],
-                const char interjectionFile[]);
+void getAnswer( char answer[], const char sentenceFile[],
+                const char interjectionFile[] );
 
-// Desc: the getPart() function will separate the line into approximately
-//       equal parts and store the partNum-th part into part[]
-// Pre:  totParts and partNum have to be positive
-// Post: the partNum-th part of the line would be stored in part[]
+// Desc: The getPart() function will separate the line into approximately
+//    equal parts and update the part param with the chunk of the sentence
+//    referred to by partIndex.
+// Pre: partIndex < numParts, numParts and partIndex must be > 0
+// Post: Part will be updated in the calling function with the specified
+//    sentence chunk.
 
 void getPart( const char line[], char part[], const int numParts, const int partIndex );
 
-// Desc: the addinterject() function will append an interjection phrase
-//       to the answer
-// Pre:  inInterject file input stream has to be open
-// Post: an interjection phrase would be append to the answer
+// Desc: The addInterject() function will append an interjection to the answer
+//     param.
+// Pre:  The file named by interjectionFile exists.
+// Post: The answer param is appended to in the calling function with an
+//     interjection.
 
-void addInterject(char answer[], const char interjectionFile[] );
+void addInterjection( char answer[], const char interjectionFile[] );
 
-// Desc:
-// Pre:
-// Post:
+// Desc: The changePunct() function changes the punctuation at the end of
+//     of the answer param to a '?', '.', or '!' character randomly.
+// Pre: answer[strlen(answer)-1] is a punctuation character
+// Post: The answer param has its punctuation changed in the calling function
+//    or keeps its original punctuation.
 
 void changePunct( char answer[] );
 
-// Desc:
-// Pre:
-// Post:
+// Desc: The openFile() function opens a stream given a fileName.
+// Pre:  T is of type ifstream or ofstream
+//       If T is of type ifstream, the file referred to by fileName must exist.
+// Post: fileIn is opened in the calling function and connected to the
+//    specified file.
 
 template <typename T>
-void openFile(T & fileIn, const char fileName[])
+void openFile( T& fileIn, const char fileName[] )
 {
   fileIn.open( fileName );
 
@@ -148,12 +163,15 @@ void openFile(T & fileIn, const char fileName[])
   return;
 }
 
-// Desc:
-// Pre:
-// Post:
+// Desc: The reuseStream() function reopens the given file stream for reuse
+//    with either the same or a different file.
+// Pre: T is of type ifstream or ofstream.
+//      If T is of type ifstream, the file referred to by fileName must exist.
+// Post: fileIn is reopened in the calling function and connected to the
+//    specified file.
 
 template <typename T>
-void reuseStream( T & fileIn, const char fileName[] )
+void reuseStream( T& fileIn, const char fileName[] )
 {
   // get stream object ready for reuse
   fileIn.clear( ); // clear connection
