@@ -8,6 +8,7 @@
 #ifndef HW8_FNCTS_H
 #define HW8_FNCTS_H
 
+#include <string>
 #include <cstring>
 #include <cstdlib>
 #include <ctime>
@@ -40,24 +41,41 @@ const short DOUBLE_LETTER_CHANCE = 3;
 const short TRIPLE_WORD_CHANCE = 2;
 // percent chance double word score
 const short DOUBLE_WORD_CHANCE = 5;
-// percent chance apending Prefix
-const short CHANCE_APPENDING = 50;
-// percent chance adding interjection
-const short CHANCE_INTERJECTION = 25;
+// percent chance for appending prefix
+const short APPEND_PREFIX_CHANCE = 50;
+// percent chance for inserting interjection
+const short INTERJECTION_CHANCE = 25;
+// percent chance for changing punctuation to period
+const short PERIOD_CHANCE = 40;
+// percent chance for changing punctuation to question mark
+const short QUESTION_MARK_CHANCE = 30;
+// percent chance for changing punctuation to exclamation point
+const short EXCLAMATION_POINT_CHANCE = 30;
+
+// number of questions to ask the "candidates"
+const short NUM_QUESTIONS = 8;
 
 // multipliers for score
 const short TRIPLE = 3;
 const short DOUBLE = 2;
 
-//minimum and maximum number of sentences chosen from file
+// minimum and maximum number of sentences chosen from file
 const short MIN_SENTENCES = 2;
 const short MAX_SENTENCES = 4;
+
+
+// Desc: the getLine() function will store the specific line in the file
+//       into line[]
+// Pre:  in has to be open already and lineNum has to be positive
+// Post: the lineNum-th line in the file would be stored in line[]
+
+void getline( ifstream & in, const int lineNum, char line[] );
 
 // Desc:
 // Pre:
 // Post:
 
-long getNumLinesInFile( const char fileName[] );
+int getNumLinesInFile( const char fileName[] );
 
 // Desc:
 // Pre:
@@ -65,17 +83,17 @@ long getNumLinesInFile( const char fileName[] );
 
 void appendRandomPrefix( char buffer[] );
 
-// Desc: the myRand() function will generate a random long within the range
+// Desc: the myRand() function will generate a random int within the range
 // Pre: none
-// Post: A random long within the range would be generated
+// Post: A random int within the range would be generated
 
-long myRand( const long min, const long max );
+int myRand( const int min, const int max );
 
-// Desc: the getScoreMult() function will get a random multiplier  
+// Desc: the getScoreMult() function will get a random multiplier
 // Pre: both doubleChance and tripleChance have to be bigger between 0 and 100
 // Post: A random score multiplier will be returned
 
-long getScoreMult( int doubleChance, int tripleChance );
+int getScoreMult( int doubleChance, int tripleChance );
 
 // Desc: the getScore() function will return a score according to the answer
 // Pre: numCharQue has to be positive
@@ -88,31 +106,28 @@ float getScore(const int numCharQue, const char answer[]);
 //      exist
 // Post: the answer generated for that candidate will be stored in answer[]
 
-void getAnswer(char answer[], const char sentenceFile[], 
+void getAnswer(char answer[], const char sentenceFile[],
                 const char interjectionFile[]);
-
-// Desc: the getLine() function will store the specific line in the file 
-//       into line[]
-// Pre:  in has to be open already and lineNum has to be positive
-// Post: the lineNum-th line in the file would be stored in line[]
-
-void getLine(ifstream & in, const int lineNum, char line[]);
 
 // Desc: the getPart() function will separate the line into approximately
 //       equal parts and store the partNum-th part into part[]
 // Pre:  totParts and partNum have to be positive
 // Post: the partNum-th part of the line would be stored in part[]
 
-void getPart(const char line[], char part[], const int totParts,
-             const int partNum);
+void getPart( const char line[], char part[], const int numParts, const int partIndex );
 
 // Desc: the addinterject() function will append an interjection phrase
 //       to the answer
 // Pre:  inInterject file input stream has to be open
 // Post: an interjection phrase would be append to the answer
 
-void addInterject(char answer[], ifstream & inInterject);
+void addInterject(char answer[], const char interjectionFile[] );
 
+// Desc:
+// Pre:
+// Post:
+
+void changePunct( char answer[] );
 
 // Desc:
 // Pre:
@@ -149,9 +164,5 @@ void reuseStream( T & fileIn, const char fileName[] )
 
   return;
 }
-
-
-void changePunct(char answer[]);
-
 
 #endif

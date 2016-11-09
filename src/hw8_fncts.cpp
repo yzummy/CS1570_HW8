@@ -6,17 +6,13 @@
 */
 
 #include "hw8_fncts.h"
-#include <string>
-#include <cstring>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
+
 using namespace std;
 
-long getNumLinesInFile( const char fileName[] )
+int getNumLinesInFile( const char fileName[] )
 {
   ifstream in;
-  long numLines = 0;
+  int numLines = 0;
 
   openFile( in, fileName );
 
@@ -27,27 +23,25 @@ long getNumLinesInFile( const char fileName[] )
   return numLines;
 }
 
+void getline( ifstream & in, const int lineNum, char line[] )
+{
+  // ignore all lines until lineNum-th line in the file
+  for (int i = 0; i < lineNum - 1; i++)
+    in.ignore( MAX_SENTENCE_LEN, '\n' );
+
+  in.getline( line, MAX_SENTENCE_LEN - 1 );
+  return;
+}
+
 void appendRandomPrefix( char buffer[] )
 {
   // numPrefixes only needs to be computed once, hence the static qualifier
-  static const long numPrefixes = getNumLinesInFile( PREFIX_EXPRESSIONS );
-
-  // max sentence length should be more than enough to store a prefix
+  static const int numPrefixes = getNumLinesInFile( PREFIX_EXPRESSIONS );
   char temp[MAX_SENTENCE_LEN] = { 0 };
-
-  long chosenPrefixIndex = rand() % numPrefixes;
-  long i;
-
   ifstream in;
 
   openFile( in, PREFIX_EXPRESSIONS );
-
-  // ignore all lines until we reach our randomly chosen line
-  for ( i = 0; i < numPrefixes && i != chosenPrefixIndex; ++i )
-    in.ignore( MAX_SENTENCE_LEN, '\n' );
-
-  // get the line we chose
-  in.getline( temp, MAX_SENTENCE_LEN - 1 );
+  getline( in, myRand( 1, numPrefixes ), temp );
 
   // use temp to store concatenation
   strncat( temp, buffer, MAX_SENTENCE_LEN - 1 );
@@ -58,20 +52,21 @@ void appendRandomPrefix( char buffer[] )
   return;
 }
 
-long myRand( const long min, const long max )
+int myRand( const int min, const int max )
 {
   // get a random number between min and max inclusively
   return rand() % ( max - min + 1 ) + min;
 }
 
-long getScoreMult( int doubleChance, int tripleChance )
+int getScoreMult( int doubleChance, int tripleChance )
 {
   int scoreMult = 1;
+  int randNum = myRand( 1, 100 );
 
   // set scoreMult to double or triple by chance
-  if ( myRand( 1, 100 ) <= doubleChance )
+  if ( randNum <= doubleChance )
     scoreMult = DOUBLE;
-  else if ( myRand( 1, 100 ) <= tripleChance )
+  else if ( randNum <= doubleChance + tripleChance )
     scoreMult = TRIPLE;
 
   return scoreMult;
@@ -88,14 +83,14 @@ float getScore(const int numCharQue, const char answer[])
   do
   {
     // add wordScore to totScore when it's space
-    if ( answer[i] == ' ' || answer[i] == '\0' ) 
+    if ( answer[i] == ' ' || answer[i] == '\0' )
     {
       multiplier = getScoreMult( DOUBLE_WORD_CHANCE, TRIPLE_WORD_CHANCE );
       totScore += wordScore * multiplier;
       wordScore = 0;
     }
     // if it is a letter, add letter score to wordScore
-    else if ( isalpha( answer[i] ) ) 
+    else if ( isalpha( answer[i] ) )
     {
       multiplier = getScoreMult( DOUBLE_LETTER_CHANCE, TRIPLE_LETTER_CHANCE );
 
@@ -138,122 +133,138 @@ float getScore(const int numCharQue, const char answer[])
   return totScore;
 }
 
-void getAnswer(char answer[], const char sentenceFile[], 
-               const char interjectionFile[])
+void getAnswer( char answer[], const char sentenceFile[],
+                const char interjectionFile[] )
 {
   // get number of sentences to take from the file
-  short randNum = myRand(MIN_SENTENCES, MAX_SENTENCES);
-  int numSentences;
-  int lineNum;
+  short numSentencesToRead = myRand( MIN_SENTENCES, MAX_SENTENCES );
+  int numSentences = 0;
+  int lineNum = 0;
+
   char line[MAX_SENTENCE_LEN] = { 0 };
-  
-  // open the sentence and interjection files
-  ifstream inSentence, inInterject;
-  openFile(inInterject, interjectionFile);
-  openFile(inSentence, sentenceFile);
+  char part[MAX_SENTENCE_LEN / 2] = { 0 };
+  ifstream in;
+
+  strncpy( answer, line, MAX_SENTENCE_LEN );
+  openFile( in, sentenceFile );
 
   // get number of lines in the sentence file
-  inSentence >> numSentences;
+  in >> numSentences;
 
   // add part of the line to the answer and add interjection by chance
-  for (int i = 0; i < randNum; i++)
+  for (int i = 0; i < numSentencesToRead; i++)
   {
-    char part[MAX_SENTENCE_LEN / 2] = { 0 };
-    reuseStream(inSentence, sentenceFile);
-    lineNum = myRand(1, numSentences) + 1;
-    getLine(inSentence, lineNum, line);
-    getPart(line, part, randNum, i);
-    strcat(answer, part);
-    if(i < randNum - 1)
-      addInterject(answer, inInterject);
+    reuseStream( in, sentenceFile );
+
+    lineNum = myRand( 2, numSentences );
+    getline( in, lineNum, line );
+    getPart( line, part, numSentencesToRead, i );
+    strncat( answer, part, MAX_SENTENCE_LEN - 1 );
+
+    if ( i < numSentencesToRead - 1 )
+      addInterject( answer, interjectionFile );
   }
 
-  // close file streams
-  inSentence.close();
-  inInterject.close();
+  if ( myRand( 1, 100 ) <= APPEND_PREFIX_CHANCE )
+    appendRandomPrefix( answer );
+
+  changePunct( answer );
+
+  in.close( );
   return;
 }
 
-void getLine(ifstream & in, const int lineNum, char line[])
+void getPart( const char line[], char part[], const int numParts, const int partIndex )
 {
-  // ignore all lines until lineNum-th line in the file
-  for (int i = 1; i < lineNum; i++)
-    in.ignore(MAX_SENTENCE_LEN,'\n');
-  in.getline(line, MAX_SENTENCE_LEN-1);
-  return;
-}
+  const int len = strlen( line );
+  int numWords = 0;
+  int numWordsPerPart = 0;
+  int leftIndex = 0;
+  int ctr = 0;
 
+  for ( int i = 0; i < len; ++i )
+    if ( line[i] == ' ' )
+      ++numWords;
+    else if ( !isspace( line[i] ) && line[i + 1] == '\0' )
+      ++numWords;
 
+  numWordsPerPart = numWords / numParts;
 
-void getPart(const char line[], char part[], const int totParts, const int partNum)
-{
-  int length = strlen(line);
-  int left = length / totParts * partNum;
-  int right = length;
-  int count=0;
- 
-  // get left index of the white space
-  if (partNum != totParts-1)
+  if ( !numWordsPerPart )
   {
-    right = length / totParts * (partNum + 1);
-    while (line[right] != ' ')
-      right--;
+    cout << "Sorry champ, I can't split that text into THAT many parts!"
+         << endl;
+
+    exit( -1 );
   }
 
-  // get right index of the white space 
-  if (partNum != 0)
+  while ( ctr < numWordsPerPart * partIndex && leftIndex < len )
+    ctr += ( line[leftIndex++] == ' ' );
+
+  if ( ctr == numWordsPerPart * partIndex && leftIndex < len )
   {
-    while (line[left] != ' ')
-      left--;
-  }
-  
-  // store that part of the line into the part[]
-  while (left < right)
-  {
-    part[count] = line[left++];
-    count++;
-  }
+    ctr = 0;
 
-  // add null character to the part[]
-  part[count] = '\0';
+    if ( partIndex == numParts - 1 )
+      numWordsPerPart = numWords - numWordsPerPart * ( numParts - 1 );
 
-  return;
-}
+    part[ctr++] = ' ';
 
-void addInterject(char answer[], ifstream & inInterject)
-{
-    int randNum = myRand(1, 100);
-    int numLines;
-    int lineNum;
-    char interjection[MAX_SENTENCE_LEN];
-
-    // add interjection by chance
-    if (randNum <= CHANCE_INTERJECTION)
+    do
     {
-      inInterject >> numLines;
-      lineNum = myRand(1, numLines) + 1;
-      for (int i = 0; i < lineNum; i++)
-        inInterject.ignore(MAX_SENTENCE_LEN, '\n');
-      
-      // ignore the three dots at the beginning
-      inInterject.ignore(3);
+      part[ctr++] = line[leftIndex++];
 
-      // read until reaches the dot at the end
-      inInterject.getline(interjection, MAX_SENTENCE_LEN - 1,'.');
-      
-      // add white space to the end of the interjection
-      strcat(answer, " ");
+      numWordsPerPart -= ( line[leftIndex] == ' ' );
+    } while ( numWordsPerPart && leftIndex < len );
+  }
+  else
+  {
+    cout << "Could not get the word(s) at index " << partIndex << "!" << endl;
+    exit( -1 );
+  }
 
-      // concatenate the interjection to the answer
-      strcat(answer, interjection);        
-    }
-    return;
-  
+  part[ctr] = '\0';
+  return;
 }
 
-void changePunct(char answer[])
+void addInterject( char answer[], const char interjectionFile[] )
 {
-  int endIndex = strlen(answer) - 1;
-  cout << answer[endIndex];
+  int numLines = 0;
+  int lineNum = 0;
+  char interjection[MAX_SENTENCE_LEN];
+  ifstream in;
+
+  // add interjection by chance
+  if ( myRand( 1, 100 ) <= INTERJECTION_CHANCE )
+  {
+    openFile( in, interjectionFile );
+    in >> numLines;
+    lineNum = myRand( 1, numLines );
+
+    for ( int i = 0; i < lineNum - 1; i++ )
+      in.ignore( MAX_SENTENCE_LEN, '\n' );
+
+    in.getline( interjection, MAX_SENTENCE_LEN - 1, '\n' );
+
+    // concatenate the interjection to the answer
+    strncat( answer, interjection, MAX_SENTENCE_LEN - 1 );
+  }
+
+  in.close( );
+  return;
+}
+
+void changePunct( char answer[] )
+{
+  int punctIndex = strlen( answer ) - 1;
+  int randNum = myRand( 1, 100 );
+
+  if ( randNum <= PERIOD_CHANCE )
+    answer[punctIndex] = '.';
+  else if ( randNum <= PERIOD_CHANCE + QUESTION_MARK_CHANCE )
+    answer[punctIndex] = '?';
+  else
+    answer[punctIndex] = '!';
+
   return;
 }
